@@ -400,6 +400,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentPlayer: 1
+  playing: 1
   empty: {fileID: 21300000, guid: cd798264605d64e4ebf13d184a239403, type: 3}
   yellow: {fileID: 21300000, guid: 478c5d8773b975347a0074245b287814, type: 3}
   red: {fileID: 21300000, guid: b13abd1cffd8440488566385a38671d5, type: 3}

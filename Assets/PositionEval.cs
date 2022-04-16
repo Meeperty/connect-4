@@ -9,11 +9,10 @@ namespace Connect4
     {
         public static bool HasPlayerWon(Vector2Int lastMove, int player)
         {
-            SquareState[,] squareStates = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameState>().squareStates;
+            SquareState[][] squareStates = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameState>().squareStates;
             SquareState playerState;
 
-            if (player == 1) { playerState = SquareState.Yellow; }
-            else { playerState = SquareState.Red; }
+            playerState = GameState.PlayerToSquareState(player);
 
             #region Horizontal & Vertical
 
@@ -22,9 +21,9 @@ namespace Connect4
             {
                 try
                 {
-                    horizontalNeighbors.Add(squareStates[lastMove.y, i]);
+                    horizontalNeighbors.Add(squareStates[i][lastMove.y]);
                 }
-                catch (IndexOutOfRangeException e)
+                catch (IndexOutOfRangeException)
                 {
                     //Debug.LogError(e.Message + $"in horizontal check at index {i}");
                 }
@@ -39,9 +38,9 @@ namespace Connect4
             {
                 try
                 {
-                    verticalNeighbors.Add(squareStates[i, lastMove.x]);
+                    verticalNeighbors.Add(squareStates[lastMove.x][i]);
                 }
-                catch (IndexOutOfRangeException e)
+                catch (IndexOutOfRangeException)
                 {
                     //Debug.LogError(e.Message + $"in vertical check at index {i}");
                 }
@@ -61,9 +60,9 @@ namespace Connect4
             {
                 try
                 {
-                    TLBRDiagonal.Add(squareStates[lastMove.y + i, lastMove.x + i]);
+                    TLBRDiagonal.Add(squareStates[lastMove.x + 1][lastMove.y + i]);
                 }
-                catch (IndexOutOfRangeException e) { }
+                catch (IndexOutOfRangeException) { }
             }
             if (LongestRun(TLBRDiagonal, playerState) >= 4) { return true; }
 
@@ -73,13 +72,23 @@ namespace Connect4
             {
                 try
                 {
-                    BLTRDiagonal.Add(squareStates[lastMove.y - i, lastMove.x + i]);
+                    //BLTRDiagonal.Add(squareStates[lastMove.y - i, lastMove.x + i]);
+                    BLTRDiagonal.Add(squareStates[lastMove.x + 1][lastMove.y - i]);
                 }
-                catch (IndexOutOfRangeException e) { }
+                catch (IndexOutOfRangeException) { }
             }
             if (LongestRun(BLTRDiagonal, playerState) >= 4) { return true; }
             #endregion
 
+            return false;
+        }
+
+        public static bool HasPlayerWon(SquareState[][] boardStates)
+        {
+            //test yellow first
+            SquareState playerState = SquareState.Yellow;
+
+            //SquareState[] = boardStates[1,2]
             return false;
         }
 

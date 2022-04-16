@@ -7,8 +7,8 @@ namespace Connect4
 {
     public class BoardSetup : MonoBehaviour
     {
-        public SquareState[,] squareStates = new SquareState[6, 7]; //height by width
-        public GameObject[,] squares = new GameObject[6, 7];
+        public SquareState[][] squareStates = GameState.InitJaggedArray(new SquareState[7][], 6); //height by width
+        public GameObject[][] squares = GameState.InitJaggedArray(new GameObject[7][], 6);
         public GameObject[] rows = new GameObject[6];
 
         // Start is called before the first frame update
@@ -18,10 +18,10 @@ namespace Connect4
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    //Debug.Log($"{rows[i].transform.Find((j+1).ToString()).gameObject}");
-                    squares[i, j] = rows[i].transform.Find((j+1).ToString()).gameObject;
+                    Debug.Log($"{rows[i].transform.Find((j+1).ToString()).parent.name}");
+                    squares[j][i] = rows[i].transform.Find((j+1).ToString()).gameObject;
 
-                    squares[i, j].GetComponent<SpriteRenderer>().sortingOrder = 1;
+                    squares[j][i].GetComponent<SpriteRenderer>().sortingOrder = 1;
                 }
             }
             Debug.Log("Set squares");
