@@ -12,7 +12,7 @@ namespace Connect4
             SquareState[][] squareStates = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameState>().squareStates;
             SquareState playerState;
 
-            playerState = GameState.PlayerToSquareState(player);
+            playerState = Utils.PlayerToSquareState(player);
 
             #region Horizontal & Vertical
 
@@ -83,22 +83,184 @@ namespace Connect4
             return false;
         }
 
-        public static bool HasPlayerWon(SquareState[][] boardStates)
+        public static int HasPlayerWon(SquareState[][] boardStates)
         {
-            //test yellow first
-            SquareState playerState = SquareState.Yellow;
+            for (int player = 1; player <= 2; player++)
+            {
+                SquareState playerState = Utils.PlayerToSquareState(player);
 
-            //SquareState[] = boardStates[1,2]
-            return false;
+                if (LongestRunInPosition(boardStates, playerState) >= 4)
+                {
+                    return player;
+                }
+            }
+            return 0;
         }
 
-        public static int LongestRun(List<SquareState> states, SquareState desiredState)
+        //public static float PositionEvaluation(SquareState[][] boardStates, int depth)
+        //{
+        //    if (depth > 1)
+        //    {
+                
+        //    }
+        //}
+
+        public static int LongestRunInPosition(SquareState[][] boardStates, SquareState desiredState)
+        {
+            int longestLen = 0;
+
+            //vertical
+            for (int i = 0; i < 7; i++)
+            {
+                int run = LongestRun(boardStates[i], desiredState);
+                if (run > longestLen)
+                {
+                    longestLen = run;
+                }
+            }
+            //horizontal
+            for (int i = 0; i < 6; i++)
+            {
+                List<SquareState> row = new List<SquareState>();
+                for (int j = 0; j < 7; j++)
+                {
+                    row.Add(boardStates[j][i]);
+                }
+                int run = LongestRun(row, desiredState);
+                if (run > longestLen)
+                {
+                    longestLen = run;
+                }
+            }
+            //TLBR diagonal
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    List<SquareState> diagonal = new List<SquareState>();
+                    for (int k = 0; k < 4; k++)
+                    {
+                        diagonal.Add(boardStates[k + i][k + j]);
+                    }
+                    int run = LongestRun(diagonal, desiredState);
+                    if (run > longestLen)
+                    {
+                        longestLen = run;
+                    }
+                }
+            }
+            //BLTR diagonal
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    List<SquareState> diagonal = new List<SquareState>();
+                    for (int k = 0; k < 4; k++)
+                    {
+                        diagonal.Add(boardStates[k + i][-k + j + 3]);
+                    }
+                    int run = LongestRun(diagonal, desiredState);
+                    if (run > longestLen)
+                    {
+                        longestLen = run;
+                    }
+                }
+            }
+
+            return longestLen;
+        }
+
+        public static int LongestRunInPosition(SquareState[][] boardStates, SquareState desiredState, out int numRuns)
+        {
+            int longestLen = 0;
+            numRuns = 0;
+
+            //vertical
+            for (int i = 0; i < 7; i++)
+            {
+                int run = LongestRun(boardStates[i], desiredState);
+                if (run > longestLen)
+                {
+                    longestLen = run;
+                    numRuns = 0;
+                }
+                if (run == longestLen) { numRuns++; }
+            }
+            //horizontal
+            for (int i = 0; i < 6; i++)
+            {
+                List<SquareState> row = new List<SquareState>();
+                for (int j = 0; j < 7; j++)
+                {
+                    row.Add(boardStates[j][i]);
+                }
+                int run = LongestRun(row, desiredState);
+                if (run > longestLen)
+                {
+                    longestLen = run;
+                    numRuns = 0;
+                }
+                if (run == longestLen) { numRuns++; }
+            }
+            //TLBR diagonal
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    List<SquareState> diagonal = new List<SquareState>();
+                    for (int k = 0; k < 4; k++)
+                    {
+                        diagonal.Add(boardStates[k + i][k + j]);
+                    }
+                    int run = LongestRun(diagonal, desiredState);
+                    if (run > longestLen)
+                    {
+                        longestLen = run;
+                        numRuns = 0;
+                    }
+                    if (run == longestLen) { numRuns++; }
+                }
+            }
+            //BLTR diagonal
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    List<SquareState> diagonal = new List<SquareState>();
+                    for (int k = 0; k < 4; k++)
+                    {
+                        diagonal.Add(boardStates[k + i][-k + j + 3]);
+                    }
+                    int run = LongestRun(diagonal, desiredState);
+                    if (run > longestLen)
+                    {
+                        longestLen = run;
+                        numRuns = 0;
+                    }
+                    if (run == longestLen) { numRuns++; }
+                }
+            }
+
+            return longestLen;
+        }
+
+        public static int LongestRun(SquareState[] statesArray, SquareState desiredState)
+        {
+            List<SquareState> states = new List<SquareState>();
+            for (int i = 0; i < states.Count; i++)
+            {
+                states.Add(states[i]);
+            }
+            return LongestRun(states, desiredState);
+        }
+
+        public static int LongestRun(List<SquareState> states, SquareState DesiredState)
         {
             int n = 0;
             int largestN = 0;
             foreach (var state in states)
             {
-                if (state == desiredState) { n++; }
+                if (state == DesiredState) { n++; }
                 if (largestN < n) { largestN = n;}
             }
             if (largestN < n) { largestN = n;}

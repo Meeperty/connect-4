@@ -52,6 +52,8 @@ namespace Connect4
             spriteEmpty = empty;
             spriteYellow = yellow;
             spriteRed = red;
+
+            Debug.Log(Utils.TimeFunction(() => PositionEval.HasPlayerWon(squareStates)));
         }
 
         private void OnGUI()
@@ -94,8 +96,8 @@ namespace Connect4
                 {
                     SpriteRenderer squareRenderer = squares[column][r].GetComponent<SpriteRenderer>();
 
-                    squareStates[column][r] = PlayerToSquareState(currentPlayer);
-                    squareRenderer.sprite = PlayerToSprite(currentPlayer);
+                    squareStates[column][r] = Utils.PlayerToSquareState(currentPlayer);
+                    squareRenderer.sprite = Utils.PlayerToSprite(currentPlayer);
 
                     if (PositionEval.HasPlayerWon(new Vector2Int(column, r), currentPlayer))
                     {
@@ -106,6 +108,19 @@ namespace Connect4
                     break;
                 }
             }
+        }
+
+        public SquareState[][] PlaceToken(SquareState[][] boardStates, int column, int player)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (boardStates[column][i] == SquareState.Empty)
+                {
+                    boardStates[column][i] = Utils.PlayerToSquareState(player);
+                    return boardStates;
+                }
+            }
+            return null;
         }
 
         public void GameWin(int winner)
@@ -161,40 +176,10 @@ namespace Connect4
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    squares[j][i].GetComponent<SpriteRenderer>().sprite = SquareStateToSprite(squareStates[j][i]);
+                    squares[j][i].GetComponent<SpriteRenderer>().sprite = Utils.SquareStateToSprite(squareStates[j][i]);
                 }
             }
         }
-
-        #region Conversions
-        public static Sprite SquareStateToSprite(SquareState state)
-        {
-            switch (state)
-            {
-                case SquareState.Empty:
-                    return spriteEmpty;
-                case SquareState.Red:
-                    return spriteRed;
-                case SquareState.Yellow:
-                    return spriteYellow;
-            }
-            throw new ImpossibleException($"Recived squareState {state}");
-        }
-
-        public static SquareState PlayerToSquareState(int player)
-        {
-            if (player == 1) { return SquareState.Yellow; }
-            if (player == 2) { return SquareState.Red; }
-            return SquareState.Empty;
-        }
-
-        public static Sprite PlayerToSprite(int player)
-        {
-            if (player == 1) { return spriteYellow; }
-            if (player == 2) { return spriteRed; }
-            return spriteEmpty;
-        }
-        #endregion
     }
 
     public enum SquareState
@@ -202,17 +187,5 @@ namespace Connect4
         Empty,
         Red,
         Yellow
-    }
-
-
-    [System.Serializable]
-    public class ImpossibleException : System.Exception
-    {
-        public ImpossibleException() { }
-        public ImpossibleException(string message) : base(message) { }
-        public ImpossibleException(string message, System.Exception inner) : base(message, inner) { }
-        protected ImpossibleException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }
